@@ -1,0 +1,21 @@
+SELECT
+    c.customer_id,
+    c.name
+FROM
+    customers AS c INNER JOIN 
+(SELECT
+    o.customer_id,
+    o.order_date,
+    SUM(o.quantity*p.price) AS total
+FROM
+    orders AS o INNER JOIN product AS p ON o.product_id = p.product_id
+GROUP BY
+    o.customer_id,
+    month(o.order_date)
+HAVING
+    total >= 100 AND (month(o.order_date) = 6 OR month(o.order_date) = 7)) AS calctbl 
+ON c.customer_id = calctbl.customer_id
+GROUP BY
+    c.customer_id
+HAVING
+    COUNT(c.customer_id) > 1
